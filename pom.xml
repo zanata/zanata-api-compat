@@ -151,7 +151,40 @@
 		</contributor>
 	</contributors>
 	
-	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>1.0.1</version>
+				<executions>
+					<execution>
+						<id>enforce-maven</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>3.0.3</version>
+								</requireMavenVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-jar</id>
+						<phase>none</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 	<profiles>
 
@@ -193,11 +226,15 @@
 								<configuration>
 									<shadedArtifactAttached>true</shadedArtifactAttached>
 									<shadedClassifierName>v1.4.4</shadedClassifierName>
-									<!-- <createSourcesJar>true</createSourcesJar> -->
+									<createSourcesJar>true</createSourcesJar>
 									<artifactSet>
 										<includes>
 											<include>org.zanata:zanata-common-api</include>
 										</includes>
+										<!-- otherwise, with maven-jar-plugin disabled, Maven tries to shade this module -->
+										<excludes>
+											<exclude>org.zanata:zanata-api-compat</exclude>
+										</excludes>
 									</artifactSet>
 									<relocations>
 										<relocation>
@@ -215,7 +252,7 @@
 					<plugin>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<configuration>
-							<failIfNoTests>false</failIfNoTests>
+							<skip>true</skip>
 						</configuration>
 					</plugin>
 
@@ -264,11 +301,15 @@
 								<configuration>
 									<shadedArtifactAttached>true</shadedArtifactAttached>
 									<shadedClassifierName>v1.3</shadedClassifierName>
-									<!-- <createSourcesJar>true</createSourcesJar> -->
+									<createSourcesJar>true</createSourcesJar>
 									<artifactSet>
 										<includes>
 											<include>org.zanata:zanata-common-api</include>
 										</includes>
+										<!-- otherwise, with maven-jar-plugin disabled, Maven tries to shade this module -->
+										<excludes>
+											<exclude>org.zanata:zanata-api-compat</exclude>
+										</excludes>
 									</artifactSet>
 									<relocations>
 										<relocation>
@@ -286,7 +327,7 @@
 					<plugin>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<configuration>
-							<failIfNoTests>false</failIfNoTests>
+							<skip>true</skip>
 						</configuration>
 					</plugin>
 
