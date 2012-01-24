@@ -226,7 +226,7 @@
 								<configuration>
 									<shadedArtifactAttached>true</shadedArtifactAttached>
 									<shadedClassifierName>v1.4.4</shadedClassifierName>
-									<createSourcesJar>true</createSourcesJar>
+									<!-- <createSourcesJar>true</createSourcesJar> -->
 									<artifactSet>
 										<includes>
 											<include>org.zanata:zanata-common-api</include>
@@ -301,7 +301,7 @@
 								<configuration>
 									<shadedArtifactAttached>true</shadedArtifactAttached>
 									<shadedClassifierName>v1.3</shadedClassifierName>
-									<createSourcesJar>true</createSourcesJar>
+									<!-- <createSourcesJar>true</createSourcesJar> -->
 									<artifactSet>
 										<includes>
 											<include>org.zanata:zanata-common-api</include>
