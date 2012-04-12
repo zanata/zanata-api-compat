@@ -1,12 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.zanata</groupId>
-		<artifactId>zanata</artifactId>
-		<version>1.4.4</version>
-	</parent>
+	<groupId>org.zanata</groupId>
 	<artifactId>zanata-api-compat</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Zanata Compatibility API</name>
 	<description>
@@ -14,8 +10,6 @@
   	</description>
   	<url>http://zanata.org/</url>
 
-	<!-- Maven likes to add the artifactIds to these URLs (thus breaking them), 
-		so we have to specify these URLs again in each POM. -->
 	<scm>
 		<connection>scm:git:git://github.com/zanata/zanata-api-compat.git</connection>
 		<developerConnection>scm:git:git@github.com:zanata/zanata-api-compat.git</developerConnection>
@@ -151,6 +145,13 @@
 	</contributors>
 	
 	<build>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-webdav-jackrabbit</artifactId>
+				<version>1.0</version>
+			</extension>
+		</extensions>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -196,6 +197,80 @@
 			built for a particular version of the API. Shadded Pattern: The package that 
 			will be assigned to all classes for the particular API version. Dependency 
 			version: The actual version of the API that needs to be packaged. -->
+		<profile>
+			<id>compat-1.5.0</id>
+
+			<activation>
+				<property>
+					<name>!skipCompatTests</name>
+				</property>
+			</activation>
+
+			<build>
+				<plugins>
+
+					<!-- Shade plugin to rename conflicting dependencies -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+
+							<!-- Zanata Dependencies -->
+							<execution>
+								<id>build-1.5.0</id>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+								<configuration>
+									<shadedArtifactAttached>true</shadedArtifactAttached>
+									<shadedClassifierName>v1.5.0</shadedClassifierName>
+									<!-- <createSourcesJar>true</createSourcesJar> -->
+									<artifactSet>
+										<includes>
+											<include>org.zanata:zanata-common-api</include>
+										</includes>
+										<!-- otherwise, with maven-jar-plugin disabled, Maven tries to shade this module -->
+										<excludes>
+											<exclude>org.zanata:zanata-api-compat</exclude>
+										</excludes>
+									</artifactSet>
+									<relocations>
+										<relocation>
+											<pattern>org.zanata</pattern>
+											<shadedPattern>org.zanata.v1_5_0</shadedPattern>
+										</relocation>
+									</relocations>
+								</configuration>
+							</execution>
+
+						</executions>
+					</plugin>
+
+					<!-- Surefire plugin so that no tests are performed on this module -->
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</plugin>
+
+				</plugins>
+			</build>
+
+			<dependencies>
+				<!-- Zanata dependencies (will get renamed for each version) -->
+				<dependency>
+					<groupId>org.zanata</groupId>
+					<artifactId>zanata-common-api</artifactId>
+					<version>1.5.0</version>
+					<scope>compile</scope>
+				</dependency>
+			</dependencies>
+
+		</profile>
+
 		<profile>
 			<id>compat-1.4.4</id>
 
@@ -370,6 +445,37 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>jboss-public-repository-group</id>
+			<name>JBoss Public Repository Group</name>
+			<url>http://repository.jboss.org/nexus/content/groups/public/</url>
+			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</repository>
 	</repositories>
 	
+	<distributionManagement>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>cloudbees-private-release-repository</id>
+			<name>cloudbees-private-release-repository</name>
+			<url>dav:https://repository-zanata.forge.cloudbees.com/release/</url>
+			<layout>default</layout>
+		</repository>
+		<snapshotRepository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>cloudbees-private-snapshot-repository</id>
+			<name>cloudbees-private-snapshot-repository</name>
+			<url>dav:https://repository-zanata.forge.cloudbees.com/snapshot/</url>
+			<layout>default</layout>
+		</snapshotRepository>
+	</distributionManagement>
+
 </project>
