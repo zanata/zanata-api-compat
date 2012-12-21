@@ -197,6 +197,80 @@
 			built for a particular version of the API. Shadded Pattern: The package that 
 			will be assigned to all classes for the particular API version. Dependency 
 			version: The actual version of the API that needs to be packaged. -->
+        <profile>
+            <id>compat-2.0.0</id>
+
+            <activation>
+                <property>
+                    <name>!skipCompatTests</name>
+                </property>
+            </activation>
+
+            <build>
+                <plugins>
+
+                    <!-- Shade plugin to rename conflicting dependencies -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+
+                            <!-- Zanata Dependencies -->
+                            <execution>
+                                <id>build-2.0.0</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                                <configuration>
+                                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                                    <shadedClassifierName>v2.0.0</shadedClassifierName>
+                                    <!-- <createSourcesJar>true</createSourcesJar> -->
+                                    <artifactSet>
+                                        <includes>
+                                            <include>org.zanata:zanata-common-api</include>
+                                        </includes>
+                                        <!-- otherwise, with maven-jar-plugin disabled, Maven tries to shade this module -->
+                                        <excludes>
+                                            <exclude>org.zanata:zanata-api-compat</exclude>
+                                        </excludes>
+                                    </artifactSet>
+                                    <relocations>
+                                        <relocation>
+                                            <pattern>org.zanata</pattern>
+                                            <shadedPattern>org.zanata.v2_0_0</shadedPattern>
+                                        </relocation>
+                                    </relocations>
+                                </configuration>
+                            </execution>
+
+                        </executions>
+                    </plugin>
+
+                    <!-- Surefire plugin so that no tests are performed on this module -->
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+
+                </plugins>
+            </build>
+
+            <dependencies>
+                <!-- Zanata dependencies (will get renamed for each version) -->
+                <dependency>
+                    <groupId>org.zanata</groupId>
+                    <artifactId>zanata-common-api</artifactId>
+                    <version>2.0.0</version>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
+
+        </profile>
+
 		<profile>
 			<id>compat-1.5.0</id>
 
