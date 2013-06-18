@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.zanata</groupId>
 	<artifactId>zanata-api-compat</artifactId>
-	<version>1.3-SNAPSHOT</version>
+	<version>1.3</version>
     <packaging>pom</packaging>
 	<name>Zanata Compatibility API</name>
 	<description>
