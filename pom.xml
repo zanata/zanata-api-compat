@@ -3,7 +3,7 @@
 	<groupId>org.zanata</groupId>
 	<artifactId>zanata-api-compat</artifactId>
 	<version>1.3-SNAPSHOT</version>
-	<packaging>jar</packaging>
+    <packaging>pom</packaging>
 	<name>Zanata Compatibility API</name>
 	<description>
   	Zanata API Compatibility libraries. Provides individually packaged versions of different Zanata clients for compatibility tests.
@@ -152,349 +152,27 @@
 				<version>1.0</version>
 			</extension>
 		</extensions>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>1.0.1</version>
-				<executions>
-					<execution>
-						<id>enforce-maven</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<rules>
-								<requireMavenVersion>
-									<version>3.0.3</version>
-								</requireMavenVersion>
-							</rules>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>default-jar</id>
-						<phase>none</phase>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.0.1</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>2.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
 	</build>
-
-	<profiles>
-
-		<!-- Maven profile used to build the compatibility API libraries. There 
-			should be one profile per version of the API to use. To add a new version 
-			of the API, just copy and paste the whole profile, and modify the following 
-			sections: Profile id: The profile Id should be changed to make it unique. 
-			Execution id: Each execution id must be different to allow multiple artifacts 
-			to be built. Shaded Classifier Name: This is the classifier for the artifact 
-			built for a particular version of the API. Shadded Pattern: The package that 
-			will be assigned to all classes for the particular API version. Dependency 
-			version: The actual version of the API that needs to be packaged. -->
-        <profile>
-            <id>compat-2.0.0</id>
-
-            <activation>
-                <property>
-                    <name>!skipCompatTests</name>
-                </property>
-            </activation>
-
-            <build>
-                <plugins>
-
-                    <!-- Shade plugin to rename conflicting dependencies -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <version>1.5</version>
-                        <executions>
-
-                            <!-- Zanata Dependencies -->
-                            <execution>
-                                <id>build-2.0.0</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                                <configuration>
-                                    <shadedArtifactAttached>true</shadedArtifactAttached>
-                                    <shadedClassifierName>v2.0.0</shadedClassifierName>
-                                    <!-- <createSourcesJar>true</createSourcesJar> -->
-                                    <artifactSet>
-                                        <includes>
-                                            <include>org.zanata:zanata-common-api</include>
-                                        </includes>
-                                        <!-- otherwise, with maven-jar-plugin disabled, Maven tries to shade this module -->
-                                        <excludes>
-                                            <exclude>org.zanata:zanata-api-compat</exclude>
-                                        </excludes>
-                                    </artifactSet>
-                                    <relocations>
-                                        <relocation>
-                                            <pattern>org.zanata</pattern>
-                                            <shadedPattern>org.zanata.v2_0_0</shadedPattern>
-                                        </relocation>
-                                    </relocations>
-                                </configuration>
-                            </execution>
-
-                        </executions>
-                    </plugin>
-
-                    <!-- Surefire plugin so that no tests are performed on this module -->
-                    <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <skip>true</skip>
-                        </configuration>
-                    </plugin>
-
-                </plugins>
-            </build>
-
-            <dependencies>
-                <!-- Zanata dependencies (will get renamed for each version) -->
-                <dependency>
-                    <groupId>org.zanata</groupId>
-                    <artifactId>zanata-common-api</artifactId>
-                    <version>2.0.0</version>
-                    <scope>compile</scope>
-                </dependency>
-            </dependencies>
-
-        </profile>
-
-		<profile>
-			<id>compat-1.5.0</id>
-
-			<activation>
-				<property>
-					<name>!skipCompatTests</name>
-				</property>
-			</activation>
-
-			<build>
-				<plugins>
-
-					<!-- Shade plugin to rename conflicting dependencies -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-shade-plugin</artifactId>
-						<version>1.5</version>
-						<executions>
-
-							<!-- Zanata Dependencies -->
-							<execution>
-								<id>build-1.5.0</id>
-								<phase>package</phase>
-								<goals>
-									<goal>shade</goal>
-								</goals>
-								<configuration>
-									<shadedArtifactAttached>true</shadedArtifactAttached>
-									<shadedClassifierName>v1.5.0</shadedClassifierName>
-									<!-- <createSourcesJar>true</createSourcesJar> -->
-									<artifactSet>
-										<includes>
-											<include>org.zanata:zanata-common-api</include>
-										</includes>
-										<!-- otherwise, with maven-jar-plugin disabled, Maven tries to shade this module -->
-										<excludes>
-											<exclude>org.zanata:zanata-api-compat</exclude>
-										</excludes>
-									</artifactSet>
-									<relocations>
-										<relocation>
-											<pattern>org.zanata</pattern>
-											<shadedPattern>org.zanata.v1_5_0</shadedPattern>
-										</relocation>
-									</relocations>
-								</configuration>
-							</execution>
-
-						</executions>
-					</plugin>
-
-					<!-- Surefire plugin so that no tests are performed on this module -->
-					<plugin>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</plugin>
-
-				</plugins>
-			</build>
-
-			<dependencies>
-				<!-- Zanata dependencies (will get renamed for each version) -->
-				<dependency>
-					<groupId>org.zanata</groupId>
-					<artifactId>zanata-common-api</artifactId>
-					<version>1.5.0</version>
-					<scope>compile</scope>
-				</dependency>
-			</dependencies>
-
-		</profile>
-
-		<profile>
-			<id>compat-1.4.4</id>
-
-			<activation>
-				<property>
-					<name>!skipCompatTests</name>
-				</property>
-			</activation>
-
-			<build>
-				<plugins>
-
-					<!-- Shade plugin to rename conflicting dependencies -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-shade-plugin</artifactId>
-						<version>1.5</version>
-						<executions>
-
-							<!-- Zanata Dependencies -->
-							<execution>
-								<id>build-1.4.4</id>
-								<phase>package</phase>
-								<goals>
-									<goal>shade</goal>
-								</goals>
-								<configuration>
-									<shadedArtifactAttached>true</shadedArtifactAttached>
-									<shadedClassifierName>v1.4.4</shadedClassifierName>
-									<!-- <createSourcesJar>true</createSourcesJar> -->
-									<artifactSet>
-										<includes>
-											<include>org.zanata:zanata-common-api</include>
-										</includes>
-										<!-- otherwise, with maven-jar-plugin disabled, Maven tries to shade this module -->
-										<excludes>
-											<exclude>org.zanata:zanata-api-compat</exclude>
-										</excludes>
-									</artifactSet>
-									<relocations>
-										<relocation>
-											<pattern>org.zanata</pattern>
-											<shadedPattern>org.zanata.v1_4_4</shadedPattern>
-										</relocation>
-									</relocations>
-								</configuration>
-							</execution>
-
-						</executions>
-					</plugin>
-
-					<!-- Surefire plugin so that no tests are performed on this module -->
-					<plugin>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</plugin>
-
-				</plugins>
-			</build>
-
-			<dependencies>
-				<!-- Zanata dependencies (will get renamed for each version) -->
-				<dependency>
-					<groupId>org.zanata</groupId>
-					<artifactId>zanata-common-api</artifactId>
-					<version>1.4.4</version>
-					<scope>compile</scope>
-				</dependency>
-			</dependencies>
-
-		</profile>
-
-		<!-- 1.3 API profile -->
-		<profile>
-			<id>compat-1.3</id>
-
-			<activation>
-				<property>
-					<name>!skipCompatTests</name>
-				</property>
-			</activation>
-
-			<build>
-				<plugins>
-
-					<!-- Shade plugin to rename conflicting dependencies -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-shade-plugin</artifactId>
-						<version>1.5</version>
-						<executions>
-
-							<!-- Zanata Dependencies -->
-							<execution>
-								<id>build-1.3</id>
-								<phase>package</phase>
-								<goals>
-									<goal>shade</goal>
-								</goals>
-								<configuration>
-									<shadedArtifactAttached>true</shadedArtifactAttached>
-									<shadedClassifierName>v1.3</shadedClassifierName>
-									<!-- <createSourcesJar>true</createSourcesJar> -->
-									<artifactSet>
-										<includes>
-											<include>org.zanata:zanata-common-api</include>
-										</includes>
-										<!-- otherwise, with maven-jar-plugin disabled, Maven tries to shade this module -->
-										<excludes>
-											<exclude>org.zanata:zanata-api-compat</exclude>
-										</excludes>
-									</artifactSet>
-									<relocations>
-										<relocation>
-											<pattern>org.zanata</pattern>
-											<shadedPattern>org.zanata.v1_3</shadedPattern>
-										</relocation>
-									</relocations>
-								</configuration>
-							</execution>
-
-						</executions>
-					</plugin>
-
-					<!-- Surefire plugin so that no tests are performed on this module -->
-					<plugin>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</plugin>
-
-				</plugins>
-			</build>
-
-			<dependencies>
-				<!-- Zanata dependencies (will get renamed for each version) -->
-				<dependency>
-					<groupId>org.zanata</groupId>
-					<artifactId>zanata-common-api</artifactId>
-					<version>1.3</version>
-					<scope>compile</scope>
-				</dependency>
-			</dependencies>
-
-		</profile>
-
-	</profiles>
 
 	<repositories>
 		<repository>
@@ -551,5 +229,12 @@
 			<layout>default</layout>
 		</snapshotRepository>
 	</distributionManagement>
+
+    <modules>
+        <module>zanata-api-2.3.0</module>
+        <module>zanata-api-1.4.4</module>
+        <module>zanata-api-1.5.0</module>
+        <module>zanata-api-1.3</module>
+    </modules>
 
 </project>
